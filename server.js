@@ -12,32 +12,9 @@ const { issueCertificate } = require('./hyperledgerService');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware to allow CORS
-// Specify allowed origin for the frontend
-const allowedOrigins = ['https://legal-aid-app-zeta.vercel.app/'];
-
-app.UseCors(builder => builder
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowAnyOrigin()
- );
-
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://legal-aid-app-zeta.vercel.app/"); // Update with your frontend origin
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
-app.use(cors({
-    origin: allowedOrigins, // use your actual domain name (or localhost), using * is not recommended
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-    mode: 'no-cors',
-    headers: {
-        'Content-Type': 'application/json',
-      },
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
-    credentials: true // Enable cookies, if necessary
-}));e(bodyParser.json());
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
 
 // Connect to the database
 connectDB();
