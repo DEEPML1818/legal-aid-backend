@@ -13,14 +13,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware to allow CORS
-const allowedOrigins = ['https://legal-aid-app-zeta.vercel.app']; // Add your frontend URL here
+// Specify allowed origin for the frontend
+const allowedOrigins = ['https://legal-aid-app-zeta.vercel.app'];
 
 app.use(cors({
     origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add the HTTP methods you want to allow
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.) if needed
-}));
-app.use(bodyParser.json());
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true // Enable cookies, if necessary
+}));e(bodyParser.json());
 
 // Connect to the database
 connectDB();
