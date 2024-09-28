@@ -61,6 +61,11 @@ const handleSubmit = async (event) => {
 
 const upload = multer({ storage: storage });
 
+app.get('/home', (req, res) => {
+    res.status(200).json('Welcome, your app is working well');
+  });
+
+
 // Application submission
 app.post('/applications', upload.single('document'), async (req, res) => {
     const { name, email, salary } = req.body;
