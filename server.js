@@ -14,10 +14,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware to allow CORS
 // Specify allowed origin for the frontend
-const allowedOrigins = ['https://legal-aid-app-zeta.vercel.app'];
+const allowedOrigins = ['https://legal-aid-app-zeta.vercel.app/'];
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://legal-aid-app-zeta.vercel.app"); // Update with your frontend origin
+    res.header("Access-Control-Allow-Origin", "https://legal-aid-app-zeta.vercel.app/"); // Update with your frontend origin
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
