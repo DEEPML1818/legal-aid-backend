@@ -5,6 +5,8 @@ const multer = require('multer');
 const Tesseract = require('tesseract.js');
 const { connectDB } = require('./database'); // Connect to MongoDB
 const Application = require('./models/Application'); // Mongoose model for applications
+const path = require('path');
+const fs = require('fs');
 
 // Hyperledger Fabric imports
 const { issueCertificate } = require('./hyperledgerService');
@@ -16,12 +18,48 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Ensure the 'uploads' folder exists or create it
+const uploadDir = './uploads';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
 // Connect to the database
 connectDB();
 
-// Multer memory storage (no more 'uploads' folder)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir); // Save files to 'uploads' folder
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname); // Unique filename with timestamp
+    }
+});
+
+const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('salary', salary);
+    formData.append('document', fileInput.files[0]); // Ensure you have an input of type="file"
+
+    try {
+        const response = await fetch('/applications', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+
+const upload = multer({ storage: storage });
 
 // Application submission
 app.post('/applications', upload.single('document'), async (req, res) => {
@@ -38,7 +76,7 @@ app.post('/applications', upload.single('document'), async (req, res) => {
         name,
         email,
         salary,
-        document: document.buffer, // Save file as buffer
+        document: document.path, // Save the file path
         status: 'pending',
         notes: []
     });
@@ -61,8 +99,8 @@ app.post('/upload/:applicationId', upload.single('document'), async (req, res) =
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        // Read the file buffer from memory
-        const buffer = req.file.buffer;
+        // Read the file buffer
+        const buffer = fs.readFileSync(req.file.path);
 
         // OCR Processing
         const { data: { text } } = await Tesseract.recognize(buffer, 'eng', {
